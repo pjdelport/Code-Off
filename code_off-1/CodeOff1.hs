@@ -3,8 +3,8 @@ module CodeOff1 where
 import           Control.Monad   (replicateM)
 import           Data.Char       (ord)
 import           Data.Foldable   (for_, traverse_)
-import           Data.List       (delete)
 import           Data.Map.Strict (Map, fromListWith, (!))
+import           Data.Set        (Set, delete, singleton, union)
 
 charValue :: Char -> Int
 charValue c
@@ -15,8 +15,8 @@ charValue c
 value :: String -> Int
 value = sum . map charValue
 
-byValue :: [String] -> Map Int [String]
-byValue lines = fromListWith (++) [(value s, [s]) | s <- lines]
+byValue :: [String] -> Map Int (Set String)
+byValue lines = fromListWith union [(value s, singleton s) | s <- lines]
 
 main :: IO ()
 main = do
