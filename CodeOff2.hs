@@ -33,8 +33,8 @@ data FilledJar = FilledJar {filledAmount :: Litre, filledType :: LiquidType}
 --
 parseJar :: String -> Jar
 parseJar s | liters:types <- read <$> splitOn "," s
-                = Jar liters types
-                | otherwise = error ("parseJar: bad spec: " ++ show s)
+           = Jar liters types
+           | otherwise = error ("parseJar: bad spec: " ++ show s)
 
 
 -- Helper: Remove liquid from a reservoir.
