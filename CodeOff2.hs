@@ -51,8 +51,9 @@ drain amount = M.update $ \v ->
 -- compatible liquid type. For example:
 --
 -- >>> fillJar (fromList [(0,10),(1,4)]) (Jar 5 [0,1,2])
--- [(fromList [(0,5),(1,4)], FilledJar {filledAmount = 5, filledType = 0})
--- ,(fromList [(0,10)],      FilledJar {filledAmount = 4, filledType = 1})]
+-- [(fromList [(0,5),(1,4)],  FilledJar {filledAmount = 5, filledType = 0})
+-- ,(fromList [(0,10)],       FilledJar {filledAmount = 4, filledType = 1})
+-- ,(fromList [(0,10),(1,4)], FilledJar {filledAmount = 0, filledType = 2})]
 --
 fillJar :: Reservoir -> Jar -> [(Reservoir, FilledJar)]
 fillJar reservoir jar =
