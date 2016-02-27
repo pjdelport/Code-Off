@@ -37,7 +37,15 @@ parseJar s | liters:types <- read <$> splitOn "," s
                 | otherwise = error ("parseJar: bad spec: " ++ show s)
 
 
--- Fill the jar with each compatible liquid type.
+-- Helper: Remove liquid from a reservoir.
+drain :: Litre -> LiquidType -> Reservoir -> Reservoir
+drain amount = M.update $ \v ->
+    case v - amount of r | 0 < r -> Just r
+                       0         -> Nothing
+                       _         -> error ("drain: negative remainder!")
+
+
+-- Fill a jar with each compatible liquid type.
 --
 -- This returns a list of filled jars and drained reservoirs, one for each
 -- compatible liquid type. For example:
@@ -47,22 +55,11 @@ parseJar s | liters:types <- read <$> splitOn "," s
 -- ,(fromList [(0,10)],      FilledJar {filledAmount = 4, filledType = 1})]
 --
 fillJar :: Reservoir -> Jar -> [(Reservoir, FilledJar)]
-fillJar reservoir jar = [ (remainder, FilledJar amount t)
-                        | t <- compatibleTypes jar
-                        , let amount = pourable t
-                        , let remainder = drain amount t reservoir
-                        ]
-  where
-    -- How much liquid of the given type can be transferred to the jar?
-    pourable :: LiquidType -> Litre
-    pourable t = capacity jar `min` M.findWithDefault 0 t reservoir
-    -- Helper: Remove liquid from the reservoir.
-    drain :: Litre -> LiquidType -> Reservoir -> Reservoir
-    drain amount = M.update $ \v ->
-        case v - amount of 0 -> Nothing
-                           r | 0 < r     -> Just r
-                             -- This should never happen.
-                             | otherwise -> error ("drain: negative remainder!")
+fillJar reservoir jar =
+    [ (drain amount t reservoir, FilledJar amount t)
+    | t <- compatibleTypes jar
+    , let amount = capacity jar `min` M.findWithDefault 0 t reservoir
+    ]
 
 
 -- Fill a list of jars in sequence. This combines the lists of alternative
